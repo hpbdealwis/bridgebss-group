@@ -290,16 +290,15 @@
   .hero-variant.is-active { display: block; }
 
   .eyebrow {
-    display: inline-flex; align-items: center; gap: 12px;
+    display: inline-flex; align-items: center; gap: 14px;
     font-family: var(--sans);
-    font-size: 17px; font-weight: 500;
+    font-size: 20px; font-weight: 500;
     letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--turquoise);
   }
-  .eyebrow .bar { width: 36px; height: 1px; background: currentColor; }
+  .eyebrow .bar { width: 40px; height: 1px; background: currentColor; flex-shrink: 0; }
   .hero .eyebrow {
-    font-size: 18px;
-    letter-spacing: 0.16em;
+    justify-content: flex-start;
   }
 
   .hero h1 {
@@ -747,13 +746,30 @@
     background: var(--blue); color: #fff;
     padding: 72px 0 64px;
   }
+  .about-hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .about-hero-top {
+    margin-bottom: 28px;
+  }
+  .about-hero-top .page-back {
+    margin-bottom: 0;
+  }
+  .about-hero-body {
+    max-width: 100%;
+  }
+  .about-hero-body .eyebrow {
+    margin: 0 0 16px;
+  }
   .about-hero h1 {
     font-size: clamp(36px,5vw,60px); font-weight: 300;
     letter-spacing: -0.03em; line-height: 1.05;
-    margin: 20px 0 24px; max-width: 22ch;
+    margin: 0 0 24px; max-width: 22ch;
   }
   .about-hero h1 em { font-style:normal; color:var(--turquoise); font-weight:500; }
-  .about-hero p { font-size:17px; color:rgba(255,255,255,.75); max-width:58ch; line-height:1.65; }
+  .about-hero p { font-size:17px; color:rgba(255,255,255,.75); max-width:58ch; line-height:1.65; margin: 0; }
   .page-back {
     display:inline-flex; align-items:center; gap:8px;
     color:rgba(255,255,255,.65); font-size:14px; font-weight:500;
@@ -816,13 +832,30 @@
   .contact-hero {
     background:var(--blue); color:#fff; padding:72px 0 64px;
   }
+  .contact-hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .contact-hero-top {
+    margin-bottom: 28px;
+  }
+  .contact-hero-top .page-back {
+    margin-bottom: 0;
+  }
+  .contact-hero-body {
+    max-width: 100%;
+  }
+  .contact-hero-body .eyebrow {
+    margin: 0 0 16px;
+  }
   .contact-hero h1 {
     font-size:clamp(36px,5vw,60px); font-weight:300;
     letter-spacing:-0.03em; line-height:1.05;
-    margin:20px 0 24px; max-width:18ch;
+    margin:0 0 24px; max-width:18ch;
   }
   .contact-hero h1 em { font-style:normal; color:var(--turquoise); font-weight:500; }
-  .contact-hero p { font-size:17px; color:rgba(255,255,255,.75); max-width:50ch; line-height:1.65; }
+  .contact-hero p { font-size:17px; color:rgba(255,255,255,.75); max-width:50ch; line-height:1.65; margin:0; }
 
   .contact-form-section {
     padding: 64px 0 80px;
@@ -1022,11 +1055,11 @@
 <!-- ============================================================ NAV -->
 <header class="nav">
   <div class="container nav-inner">
-    <a class="brand" href="#" aria-label="Bridge Group">
-      <img class="mark" src="assets/logo-bridge-group-nav.png" alt="Bridge Group">
+    <a class="brand" href="#" aria-label="Bridge Group" onclick="showPage('home'); return false;">
+      <img class="mark" src="/static/assets/logo-bridge-group-nav.png" alt="Bridge Group">
     </a>
     <nav class="nav-links" aria-label="Primary">
-      <a href="#purpose">Our purpose</a>
+      <a href="#purpose" onclick="goToSection('purpose'); return false;">Our purpose</a>
       <a href="#" onclick="showPage('about');return false;">About Us</a>
       <a href="#" onclick="showPage('contact');return false;">Contact Us</a>
     </nav>
@@ -1058,7 +1091,7 @@
               See our work
               <span class="arrow" aria-hidden="true">→</span>
             </a>
-            <a class="btn btn-ghost" href="#purpose">Our purpose</a>
+            <a class="btn btn-ghost" href="#purpose" onclick="goToSection('purpose'); return false;">Our purpose</a>
           </div>
 
         </aside>
@@ -1082,23 +1115,23 @@
           Explore our verticals
           <span class="arrow" aria-hidden="true">→</span>
         </a>
-        <a class="btn btn-ghost" href="#purpose">Read our purpose</a>
+        <a class="btn btn-ghost" href="#purpose" onclick="goToSection('purpose'); return false;">Read our purpose</a>
       </div>
       <div class="heroB-rail">
         <div class="cell">
-          <div class="vertical-logo-wrap is-talent"><img src="assets/logo-talent.svg" alt="Bridge Talent" class="vertical-logo-img logo-talent"></div>
+          <div class="vertical-logo-wrap is-talent"><img src="/static/assets/logo-talent.svg" alt="Bridge Talent" class="vertical-logo-img logo-talent"></div>
           <div class="num">01 / Talent</div>
           <h3>The right people.</h3>
           <p>Scale teams, fill capability gaps, and build lasting performance.</p>
         </div>
         <div class="cell">
-          <div class="vertical-logo-wrap"><img src="assets/logo-tech.svg" alt="Bridge Tech" class="vertical-logo-img"></div>
+          <div class="vertical-logo-wrap"><img src="/static/assets/logo-tech.svg" alt="Bridge Tech" class="vertical-logo-img"></div>
           <div class="num">02 / Tech</div>
           <h3>Systems that fit.</h3>
           <p>Custom software built around the real workflows of each client.</p>
         </div>
         <div class="cell">
-          <div class="vertical-logo-wrap"><img src="assets/logo-health.svg" alt="Bridge Health" class="vertical-logo-img"></div>
+          <div class="vertical-logo-wrap"><img src="/static/assets/logo-health.svg" alt="Bridge Health" class="vertical-logo-img"></div>
           <div class="num">03 / Health</div>
           <h3>Specialist depth.</h3>
           <p>Consulting for pharmaceutical and regulated manufacturing environments.</p>
@@ -1155,10 +1188,10 @@
       <!-- Talent -->
       <article class="v-card">
         <div class="v-card-logo-wrap">
-          <img src="assets/logo-talent.svg" alt="Bridge Talent" class="v-card-logo logo-talent">
+          <img src="/static/assets/logo-talent.svg" alt="Bridge Talent" class="v-card-logo logo-talent">
         </div>
         <div class="v-card-copy">
-          <h3>The right hire changes everything.<br><em>So does the right opportunity.</em></h3>
+          <h3>The right hire changes everything.<br>So does the right opportunity.</h3>
           <p>We connect businesses with vetted professionals across every function, and we stay involved long after day one. Because we understand what the wrong hire costs, and what the right opportunity means to the person in the role.</p>
         </div>
         <ul>
@@ -1172,7 +1205,7 @@
       <!-- Tech -->
       <article class="v-card">
         <div class="v-card-logo-wrap">
-          <img src="assets/logo-tech.svg" alt="Bridge Tech" class="v-card-logo">
+          <img src="/static/assets/logo-tech.svg" alt="Bridge Tech" class="v-card-logo">
         </div>
         <div class="v-card-copy">
           <h3>Software built around<br>how you actually work.</h3>
@@ -1189,7 +1222,7 @@
       <!-- Health -->
       <article class="v-card">
         <div class="v-card-logo-wrap">
-          <img src="assets/logo-health.svg" alt="Bridge Health" class="v-card-logo">
+          <img src="/static/assets/logo-health.svg" alt="Bridge Health" class="v-card-logo">
         </div>
         <div class="v-card-copy">
           <h3>Healthcare sovereignty<br>starts<br>with manufacturing.</h3>
@@ -1211,17 +1244,17 @@
   <div class="container">
     <div class="footer-inner">
       <div>
-        <a class="brand" href="#" aria-label="Bridge Group">
-          <img class="mark" src="assets/logo-bridge-group-footer.png" alt="Bridge Group">
+        <a class="brand" href="#" aria-label="Bridge Group" onclick="showPage('home'); return false;">
+          <img class="mark" src="/static/assets/logo-bridge-group-footer.png" alt="Bridge Group">
         </a>
         <p class="footer-tag">
-          Solving complex problems across Talent, Technology, and Health.
+          Solving complex problems across<br>Talent, Technology, and Health.
         </p>
       </div>
       <div class="footer-col">
         <h4>Navigate</h4>
         <ul>
-          <li><a href="#purpose">Our purpose</a></li>
+          <li><a href="#purpose" onclick="goToSection('purpose'); return false;">Our purpose</a></li>
           <li><a href="#" onclick="showPage('about');return false;">About Us</a></li>
           <li><a href="#" onclick="showPage('contact');return false;">Contact Us</a></li>
         </ul>
@@ -1395,13 +1428,17 @@
 
 <div class="page-section" id="page-about">
   <div class="about-hero">
-    <div class="container">
-      <button class="page-back" onclick="showPage('home')">
-        ← Back to home
-      </button>
-      <span class="eyebrow" style="color:var(--turquoise)"><span class="bar"></span>About Bridge</span>
-      <h1>The people who<br><em>built this.</em></h1>
-      <p>Bridge is led by a multidisciplinary founding team with deep expertise across innovation, finance, operations, and technology, and decades of global experience building scalable systems and delivering real-world impact.</p>
+    <div class="container about-hero-inner">
+      <div class="about-hero-top">
+        <button class="page-back" onclick="showPage('home')">
+          ← Back to home
+        </button>
+      </div>
+      <div class="about-hero-body">
+        <span class="eyebrow" style="color:var(--turquoise)"><span class="bar"></span>About Bridge</span>
+        <h1>The people who<br><em>built this.</em></h1>
+        <p>Bridge is led by a multidisciplinary founding team with deep expertise across innovation, finance, operations, and technology, and decades of global experience building scalable systems and delivering real-world impact.</p>
+      </div>
     </div>
   </div>
 
@@ -1411,31 +1448,31 @@
       <div class="founder-cards">
         <div class="founder-card">
           <div class="founder-top">
-            <img class="f-avatar-img" src="assets/photo-kerry-gilmore.png" alt="Dr. Kerry Gilmore">
+            <img class="f-avatar-img" src="/static/assets/photo-kerry-gilmore.png" alt="Dr. Kerry Gilmore">
             <div><h3>Dr. Kerry Gilmore</h3><div class="f-title">Chief Executive Officer</div></div>
           </div>
-          <p>An inventor and research scientist with over two decades spent turning complex problems into patented, commercial solutions. Dr. Gilmore holds six patents and has authored more than 50 peer-reviewed publications. He has co-founded five companies, each built on the same principle: that rigorous science and commercial pragmatism are not opposites. At Bridge, he applies that discipline to workforce quality — treating talent placement as a system to be designed, tested, and continuously improved.</p>
+          <p>An inventor and research scientist with over two decades spent turning complex problems into patented, commercial solutions. Dr. Gilmore holds six patents and has authored more than 50 peer-reviewed publications. He has co-founded five companies, each built on the same principle: that rigorous science and commercial pragmatism are not opposites. At Bridge, he applies that discipline to workforce quality treating talent placement as a system to be designed, tested, and continuously improved.</p>
         </div>
         <div class="founder-card">
           <div class="founder-top">
-            <img class="f-avatar-img" src="assets/photo-roshan-de-silva.png" alt="Roshan De Silva">
+            <img class="f-avatar-img" src="/static/assets/photo-roshan-de-silva.png" alt="Roshan De Silva">
             <div><h3>Roshan De Silva</h3><div class="f-title">Chief Operating Officer</div></div>
           </div>
           <p>A technology delivery leader with over 20 years of experience driving complex, large-scale implementations across enterprise and government sectors in Sri Lanka, the Maldives, and the Middle East. Most recently Vice President of Smart Building and Smart Factory Solutions at MillenniumIT ESP, where he led large-scale digital transformation programmes end to end. He brings the delivery rigour that makes complex, multi-market engagements actually work.</p>
         </div>
         <div class="founder-card">
           <div class="founder-top">
-            <img class="f-avatar-img" src="assets/photo-sanjiv-malalasekara.png" alt="Sanjiv Malalasekara">
+            <img class="f-avatar-img" src="/static/assets/photo-sanjiv-malalasekara.png" alt="Sanjiv Malalasekara">
             <div><h3>Sanjiv Malalasekara</h3><div class="f-title">Chief Financial Officer</div></div>
           </div>
-          <p>A finance leader with a career built at institutions where precision is non-negotiable. Senior roles at Morgan Stanley and Credit Suisse in London, Ernst &amp; Young across Sydney and London, and ANZ as Corporate Banking Head of Strategy across Asia Pacific. Also Managing Director and Partner at Arinma Holdings. He brings institutional-grade financial governance and cross-regional commercial insight to Bridge.</p>
+          <p>A finance leader with a career built at institutions where precision is non negotiable. Senior roles at Morgan Stanley and Credit Suisse in London, Ernst &amp; Young across Sydney and London, and ANZ as Corporate Banking Head of Strategy across Asia Pacific. Also Managing Director and Partner at Arinma Holdings. He brings institutional-grade financial governance and cross-regional commercial insight to Bridge.</p>
         </div>
         <div class="founder-card">
           <div class="founder-top">
-            <img class="f-avatar-img" src="assets/photo-gayan-hanthige.png" alt="Gayan Hanthige">
+            <img class="f-avatar-img" src="/static/assets/photo-gayan-hanthige.png" alt="Gayan Hanthige">
             <div><h3>Gayan Hanthige</h3><div class="f-title">Chief Technical Officer</div></div>
           </div>
-          <p>A digital transformation specialist with over a decade leading technology implementations across ERP, IoT, and enterprise software systems. At Bridge, he leads the technical layer that underpins how talent is found, assessed, and matched — applying end-to-end systems thinking to the workforce problem.</p>
+          <p>A digital transformation specialist with over a decade leading technology implementations across ERP, IoT, and enterprise software systems. At Bridge, he leads the technical layer that underpins how talent is found, assessed, and matched applying end-to-end systems thinking to the workforce problem.</p>
         </div>
       </div>
     </div>
@@ -1444,7 +1481,6 @@
   <div class="presence">
     <div class="container">
       <span class="eyebrow" style="color:var(--turquoise)"><span class="bar"></span>Global presence</span>
-      <h2>We are where our clients<br><em>and candidates are.</em></h2>
       <p class="sub">Bridge operates across the United States, the United Kingdom, the UAE, and Sri Lanka, with senior teams on the ground in each region, bringing local fluency and long-term commitment to every engagement.</p>
       <div class="map-wrap"><svg viewBox="0 0 960 480" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
 <rect width="960" height="480" fill="#e8f2f8"/>
@@ -1648,13 +1684,17 @@
 
 <div class="page-section" id="page-contact">
   <div class="contact-hero">
-    <div class="container">
-      <button class="page-back" onclick="showPage('home')">
-        ← Back to home
-      </button>
-      <span class="eyebrow" style="color:var(--turquoise)"><span class="bar"></span>Contact</span>
-      <h1>Start with<br><em>the problem.</em></h1>
-      <p>We don&#39;t pitch before we listen. Reach out and tell us what you&#39;re working through — we&#39;ll tell you honestly whether and how Bridge can help.</p>
+    <div class="container contact-hero-inner">
+      <div class="contact-hero-top">
+        <button class="page-back" onclick="showPage('home')">
+          ← Back to home
+        </button>
+      </div>
+      <div class="contact-hero-body">
+        <span class="eyebrow" style="color:var(--turquoise)"><span class="bar"></span>Contact</span>
+        <h1>Start with<br><em>the problem.</em></h1>
+        <p>We don&#39;t pitch before we listen. Reach out and tell us what you&#39;re working through  we&#39;ll tell you honestly whether and how Bridge can help.</p>
+      </div>
     </div>
   </div>
   <section class="contact-form-section" aria-label="Contact form">
@@ -1733,28 +1773,93 @@
     if(target) target.style.display='block';
     window.scrollTo({top:0,behavior:'smooth'});
   }
+
+  function goToSection(id){
+    var home=document.getElementById('page-home');
+    var onHome=home && home.style.display!=='none';
+    if(!onHome){
+      document.querySelectorAll('.page-section').forEach(function(el){
+        el.style.display='none';
+      });
+      if(home) home.style.display='block';
+    }
+    requestAnimationFrame(function(){
+      var section=document.getElementById(id);
+      if(section){
+        section.scrollIntoView({behavior:'smooth',block:'start'});
+      } else {
+        window.scrollTo({top:0,behavior:'smooth'});
+      }
+    });
+    if(history.pushState){
+      history.pushState(null,'','#'+id);
+    }
+  }
+
   window.showPage=showPage;
+  window.goToSection=goToSection;
   showPage('home');
 
   var contactForm = document.getElementById('contactForm');
   if (contactForm) {
     var contactFormSuccess = document.getElementById('contactFormSuccess');
     var contactFormError = document.getElementById('contactFormError');
+    var contactSubmitBtn = contactForm.querySelector('.submit-btn');
+    var contactSubmitDefaultHtml = contactSubmitBtn ? contactSubmitBtn.innerHTML : '';
     var contactEmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     contactForm.addEventListener('submit', function(e) {
       e.preventDefault();
       var firstName = document.getElementById('contactFirstName').value.trim();
       var lastName = document.getElementById('contactLastName').value.trim();
       var email = document.getElementById('contactEmail').value.trim();
+      var company = document.getElementById('contactCompany').value.trim();
+      var interestEl = document.getElementById('contactInterest');
+      var interest = interestEl.value;
+      var message = document.getElementById('contactMessage').value.trim();
+
       if (!firstName || !lastName || !contactEmailPattern.test(email)) {
         contactFormError.textContent = 'Please fill in first name, last name, and a valid email.';
         contactFormError.style.display = 'block';
         return;
       }
+
       contactFormError.style.display = 'none';
-      contactForm.style.display = 'none';
-      contactFormSuccess.hidden = false;
-      contactFormSuccess.classList.add('show');
+      if (contactSubmitBtn) {
+        contactSubmitBtn.disabled = true;
+        contactSubmitBtn.style.opacity = '0.7';
+        contactSubmitBtn.innerHTML = 'Sending&hellip;';
+      }
+
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          company: company,
+          interest: interest,
+          message: message
+        })
+      })
+      .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
+      .then(function(result) {
+        if (!result.ok || !result.data.ok) {
+          throw new Error((result.data && result.data.error) || 'Something went wrong. Please try again.');
+        }
+        contactForm.style.display = 'none';
+        contactFormSuccess.hidden = false;
+        contactFormSuccess.classList.add('show');
+      })
+      .catch(function(err) {
+        contactFormError.textContent = err.message || 'We could not send your message. Please try again later.';
+        contactFormError.style.display = 'block';
+        if (contactSubmitBtn) {
+          contactSubmitBtn.disabled = false;
+          contactSubmitBtn.style.opacity = '';
+          contactSubmitBtn.innerHTML = contactSubmitDefaultHtml;
+        }
+      });
     });
   }
 })();
