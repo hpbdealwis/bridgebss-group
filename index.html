@@ -606,6 +606,7 @@
     font-size: 24px; line-height: 1.45;
     font-family: var(--display); font-weight: 300;
     color: var(--ink); letter-spacing: -0.01em;
+    margin-top: 96px;
     margin-bottom: 32px;
   }
   .purpose-body p:last-child { margin-bottom: 0; }
@@ -814,13 +815,12 @@
   }
   .map-wrap svg { width:100%; height:auto; display:block; }
   .presence-offices {
-    display:grid; grid-template-columns:repeat(4,1fr); gap:0;
-    margin-top:40px; border-top:1px solid rgba(255,255,255,.15);
+    display:grid; grid-template-columns:repeat(4,1fr); gap:32px;
+    margin-top:40px;
   }
   .presence-offices .office {
-    padding:20px 16px 4px 0; border-right:1px solid rgba(255,255,255,.1);
+    padding:0;
   }
-  .presence-offices .office:last-child { border-right:none; }
   .presence-offices .region {
     font-size:10px; font-weight:600; letter-spacing:0.14em;
     text-transform:uppercase; color:var(--turquoise); margin-bottom:6px;
@@ -1076,23 +1076,23 @@
     <div class="container heroA">
       <div class="heroA-grid">
         <div>
-          <span class="eyebrow"><span class="bar"></span>Talent · Tech · Health</span>
+          <span class="eyebrow">Talent · Tech · Health</span><br><br><br>
           <h1 style="margin-top:28px;">
             Complex problems,<br>
             <em>engineered</em> solutions.
-          </h1>
+          </h1><br>
         </div>
         <aside class="heroA-side">
           <p class="lede">
             Bridge brings focused expertise across talent, technology, and health, with the cross-domain thinking to see what others miss.
           </p>
           <div class="actions">
-            <a class="btn btn-primary" href="#verticals">
+            <a class="btn btn-primary" href="#verticals" onclick="goToSection('verticals'); return false;">
               See our work
               <span class="arrow" aria-hidden="true">→</span>
             </a>
             <a class="btn btn-ghost" href="#purpose" onclick="goToSection('purpose'); return false;">Our purpose</a>
-          </div>
+          </div><br><br>
 
         </aside>
       </div>
@@ -1111,7 +1111,7 @@
         When you get the people and the systems right, everything else follows. Bridge operates across three focused verticals, each built to deliver targeted expertise where organisations need it most.
       </p>
       <div class="actions">
-        <a class="btn btn-primary" href="#verticals">
+        <a class="btn btn-primary" href="#verticals" onclick="goToSection('verticals'); return false;">
           Explore our verticals
           <span class="arrow" aria-hidden="true">→</span>
         </a>
@@ -1147,7 +1147,7 @@
   <div class="container">
     <div class="purpose-grid">
       <div>
-        <span class="eyebrow"><span class="bar"></span>Purpose</span>
+        <span class="eyebrow">Purpose</span><br><br><br>
         <h2>Complex problems don't <em>fix&nbsp;themselves.</em></h2>
       </div>
       <div class="purpose-body">
@@ -1175,7 +1175,7 @@
   <div class="container">
     <div class="section-head">
       <div>
-        <span class="eyebrow"><span class="bar"></span>What we do</span>
+        <span class="eyebrow">What we do</span><br><br>
         <h2>Three disciplines.<br><em>One way of thinking.</em></h2>
       </div>
       <p class="desc">
@@ -1191,15 +1191,15 @@
           <img src="assets/logo-talent.svg" alt="Bridge Talent" class="v-card-logo logo-talent">
         </div>
         <div class="v-card-copy">
-          <h3>The right hire changes everything.<br>So does the right opportunity.</h3>
-          <p>We connect businesses with vetted professionals across every function, and we stay involved long after day one. Because we understand what the wrong hire costs, and what the right opportunity means to the person in the role.</p>
+          <h3>The right hire changes everything<br>So does the <strong>right opportunity</strong></h3>
+          <p>We connect businesses with vetted professionals across every function, because we understand what the wrong hire costs and what the right opportunity means to the person involved.Tech and non-tech roles across IT, engineering, sales, finance, operations, and more</p>
         </div>
         <ul>
           <li>Tech and non-tech roles across engineering, sales, finance, operations, and more</li>
           <li>Offshore talent solutions built for long-term performance</li>
           <li>Single placements to fully managed workforce solutions</li>
         </ul>
-        <a class="more" href="#">Explore Bridge Talent <span class="arrow">→</span></a>
+        <a class="more" href="https://bridgebsstalent.com/" target="_blank" rel="noopener noreferrer">Explore Bridge Talent <span class="arrow">→</span></a>
       </article>
 
       <!-- Tech -->
@@ -1208,24 +1208,24 @@
           <img src="assets/logo-tech.svg" alt="Bridge Tech" class="v-card-logo">
         </div>
         <div class="v-card-copy">
-          <h3>Software built around<br>how you actually work.</h3>
-          <p>Custom platforms and tooling designed to fit the real workflows and goals of each client, not the other way around.</p>
+          <h3>Software built around<br><strong>how you actually work</strong></h3>
+          <p>We build custom platforms and tools around the real workflows and goals of each client, designed to fit the way you work, not the other way around.</p>
         </div>
         <ul>
           <li>Custom software &amp; platforms</li>
           <li>Workflow &amp; systems integration</li>
           <li>Data, automation &amp; AI engineering</li>
         </ul>
-        <a class="more" href="#">Explore Bridge Tech <span class="arrow">→</span></a>
+        <a class="more" href="https://bridgebsstech.com/" target="_blank" rel="noopener noreferrer">Explore Bridge Tech <span class="arrow">→</span></a>
       </article>
 
       <!-- Health -->
       <article class="v-card">
         <div class="v-card-logo-wrap">
-          <img src="assets/logo-health.svg" alt="Bridge Health" class="v-card-logo">
+          <img src="/static/assets/logo-health.svg" alt="Bridge Health" class="v-card-logo">
         </div>
         <div class="v-card-copy">
-          <h3>Healthcare sovereignty<br>starts<br>with manufacturing.</h3>
+          <h3>Healthcare sovereignty<br><strong>starts<br>with manufacturing</strong></h3>
           <p>We bring deep expertise in pharmaceutical operations, with strength in continuous manufacturing, GMP environments, and regulated change that holds up under scrutiny.</p>
         </div>
         <ul>
@@ -1233,7 +1233,7 @@
           <li>GMP &amp; regulated operations</li>
           <li>Process design &amp; validation</li>
         </ul>
-        <a class="more" href="#">Explore Bridge Health <span class="arrow">→</span></a>
+        <a class="more" href="https://bridgebsshealth.com/" target="_blank" rel="noopener noreferrer">Explore Bridge Health <span class="arrow">→</span></a>
       </article>
 
     </div>
@@ -1262,9 +1262,9 @@
       <div class="footer-col">
         <h4>Verticals</h4>
         <ul>
-          <li><a href="#">Bridge Talent</a></li>
-          <li><a href="#">Bridge Tech</a></li>
-          <li><a href="#">Bridge Health</a></li>
+          <li><a href="https://bridgebsstalent.com/" target="_blank" rel="noopener noreferrer">Bridge Talent</a></li>
+          <li><a href="https://bridgebsstech.com/" target="_blank" rel="noopener noreferrer">Bridge Tech</a></li>
+          <li><a href="https://bridgebsshealth.com/" target="_blank" rel="noopener noreferrer">Bridge Health</a></li>
         </ul>
       </div>
     </div>
@@ -1419,6 +1419,45 @@
 })();
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const heroA = document.querySelector('.heroA');
+  if (heroA) {
+    heroA.style.paddingTop = '40px';
+    const eyebrow = heroA.querySelector('.eyebrow');
+    if (eyebrow) eyebrow.style.marginTop = '0';
+  }
+
+  const verticals = document.querySelector('#verticals');
+  if (verticals) {
+    verticals.style.paddingTop = '40px';
+    const wwdEyebrow = verticals.querySelector('.section-head .eyebrow');
+    if (wwdEyebrow) wwdEyebrow.style.marginTop = '0';
+  }
+
+  const purpose = document.querySelector('#purpose');
+  if (purpose) {
+    purpose.style.paddingTop = '40px';
+    const purposeEyebrow = purpose.querySelector('.purpose-grid .eyebrow');
+    if (purposeEyebrow) purposeEyebrow.style.marginTop = '0';
+  }
+
+  const aboutHero = document.querySelector('#page-about .about-hero');
+  if (aboutHero) {
+    aboutHero.style.paddingTop = '40px';
+    const aboutEyebrow = aboutHero.querySelector('.about-hero-body .eyebrow');
+    if (aboutEyebrow) aboutEyebrow.style.marginTop = '0';
+  }
+
+  const contactHero = document.querySelector('#page-contact .contact-hero');
+  if (contactHero) {
+    contactHero.style.paddingTop = '40px';
+    const contactEyebrow = contactHero.querySelector('.contact-hero-body .eyebrow');
+    if (contactEyebrow) contactEyebrow.style.marginTop = '0';
+  }
+});
+</script>
+
 
 
 
@@ -1435,7 +1474,7 @@
         </button>
       </div>
       <div class="about-hero-body">
-        <span class="eyebrow" style="color:var(--turquoise)"><span class="bar"></span>About Bridge</span>
+        <span class="eyebrow" style="color:var(--turquoise)">About Bridge</span><br><br>
         <h1>The people who<br><em>built this.</em></h1>
         <p>Bridge is led by a multidisciplinary founding team with deep expertise across innovation, finance, operations, and technology, and decades of global experience building scalable systems and delivering real-world impact.</p>
       </div>
@@ -1691,7 +1730,7 @@
         </button>
       </div>
       <div class="contact-hero-body">
-        <span class="eyebrow" style="color:var(--turquoise)"><span class="bar"></span>Contact</span>
+        <span class="eyebrow" style="color:var(--turquoise)">Contact</span><br><br>
         <h1>Start with<br><em>the problem.</em></h1>
         <p>We don&#39;t pitch before we listen. Reach out and tell us what you&#39;re working through  we&#39;ll tell you honestly whether and how Bridge can help.</p>
       </div>
@@ -1740,7 +1779,7 @@
             </div>
           </div>
           <div class="form-submit">
-            <span class="note">We typically respond within 24 hours during business days.</span>
+            <span class="note">We aim to respond within one business day.</span>
             <button type="submit" class="submit-btn">
               Send Message
               <svg class="btn-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -1774,6 +1813,27 @@
     window.scrollTo({top:0,behavior:'smooth'});
   }
 
+  function navScrollOffset(){
+    var nav=document.querySelector('.nav');
+    return nav ? nav.offsetHeight : 0;
+  }
+
+  function sectionScrollTarget(section){
+    if(section.id==='verticals'){
+      return section.querySelector('.section-head')||section;
+    }
+    if(section.id==='purpose'){
+      return section.querySelector('.purpose-grid > div:first-child')||section;
+    }
+    return section;
+  }
+
+  function scrollToElement(section){
+    var target=sectionScrollTarget(section);
+    var top=target.getBoundingClientRect().top+window.pageYOffset-navScrollOffset();
+    window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+  }
+
   function goToSection(id){
     var home=document.getElementById('page-home');
     var onHome=home && home.style.display!=='none';
@@ -1783,12 +1843,19 @@
       });
       if(home) home.style.display='block';
     }
-    requestAnimationFrame(function(){
+    function scrollToTarget(){
       var section=document.getElementById(id);
       if(section){
-        section.scrollIntoView({behavior:'smooth',block:'start'});
+        scrollToElement(section);
       } else {
         window.scrollTo({top:0,behavior:'smooth'});
+      }
+    }
+    requestAnimationFrame(function(){
+      if(onHome){
+        scrollToTarget();
+      } else {
+        requestAnimationFrame(scrollToTarget);
       }
     });
     if(history.pushState){
