@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bridge Careers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Nunito Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; }
+  input, select { font-family: inherit; }
+  #loading {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: #fff; color: #6b7280; font-size: 14px; z-index: 1000;
+  }
+</style>
+</head>
+<body>
+<div id="loading">Loading prototype…</div>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useMemo, useEffect } = React;
+
+/* ── Inline icons (replacing lucide-react for standalone use) ─────────── */
+const Icon = ({ children, size = 16, color = 'currentColor', style = {} }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={style}>
+    {children}
+  </svg>
+);
+const Search = (p) => <Icon {...p}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></Icon>;
+const MapPin = (p) => <Icon {...p}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></Icon>;
+const Briefcase = (p) => <Icon {...p}><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></Icon>;
+const Clock = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></Icon>;
+const ArrowRight = (p) => <Icon {...p}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></Icon>;
+const Upload = (p) => <Icon {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></Icon>;
+const Check = (p) => <Icon {...p}><polyline points="20 6 9 17 4 12"/></Icon>;
+
+/* ── Design tokens ─────────────────────────────────────────────────── */
+const bridge = {
+  blue: '#0E436F', blueDark: '#092d4d', blueLight: '#e8f0f7',
+  purple: '#603f83', purpleLight: '#f0ebf7',
+  teal: '#21a682', tealLight: '#e6f7f2',
+  yellow: '#fadf77',
+  g50: '#f9fafb', g100: '#f3f4f6', g200: '#e5e7eb',
+  g500: '#6b7280', g700: '#374151', g900: '#111827',
+};
+
+const verticals = [
+  { key: 'all', name: 'All Bridge', tagline: 'See every open role across the group', color: bridge.blue, colorLight: bridge.blueLight },
+  { key: 'bss', name: 'Bridge BSS', tagline: 'Group functions & shared services', color: bridge.blue, colorLight: bridge.blueLight },
+  { key: 'talent', name: 'Bridge Talent', tagline: 'Integrated global talent solutions', color: bridge.purple, colorLight: bridge.purpleLight },
+  { key: 'health', name: 'Bridge Health', tagline: 'Continuous pharmaceutical manufacturing', color: bridge.teal, colorLight: bridge.tealLight },
+  { key: 'tech', name: 'Bridge Tech', tagline: 'Software & AI products', color: '#2149a6', colorLight: '#e8ecf9' },
+];
+
+const functions = ['All functions', 'Engineering', 'Science & Regulatory', 'People', 'Finance', 'Sales & BD', 'Marketing', 'Design'];
+const regions = ['All locations', 'Sri Lanka', 'United States', 'UK', 'Global'];
+const workModes = ['Any', 'Remote', 'Hybrid', 'On-site'];
+
+/* ── Main app ─────────────────────────────────────────────────────── */
+function BridgeCareers() {
+  const [view, setView] = useState('board');
+  const [selectedRoleId, setSelectedRoleId] = useState(null);
+  const [activeVertical, setActiveVertical] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFunction, setSelectedFunction] = useState('All functions');
+  const [selectedRegion, setSelectedRegion] = useState('All locations');
+  const [selectedWorkMode, setSelectedWorkMode] = useState('Any');
+  const [roles, setRoles] = useState([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
+  const [rolesError, setRolesError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setRolesLoading(true);
+      setRolesError('');
+      try {
+        const res = await fetch('/api/careers/jobs');
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || 'Could not load jobs.');
+        if (!cancelled) setRoles(data.jobs || []);
+      } catch (err) {
+        if (!cancelled) setRolesError(err.message || 'Could not load jobs.');
+      } finally {
+        if (!cancelled) setRolesLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const filteredRoles = useMemo(() => {
+    return roles.filter(role => {
+      if (activeVertical !== 'all' && role.verticalKey !== activeVertical) return false;
+      if (selectedFunction !== 'All functions' && role.function !== selectedFunction) return false;
+      if (selectedRegion !== 'All locations' && role.region !== selectedRegion) return false;
+      if (selectedWorkMode !== 'Any' && role.workMode !== selectedWorkMode) return false;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        if (!role.title.toLowerCase().includes(q) && !role.summary.toLowerCase().includes(q) && !role.function.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+  }, [roles, activeVertical, selectedFunction, selectedRegion, selectedWorkMode, searchQuery]);
+
+  const selectedRole = roles.find(r => r.id === selectedRoleId);
+  const activeVerticalInfo = verticals.find(v => v.key === activeVertical);
+
+  const openRole = (id) => { setSelectedRoleId(id); setView('role'); window.scrollTo(0, 0); };
+  const startApplication = () => { setView('apply'); window.scrollTo(0, 0); };
+  const goBack = () => { setView('board'); setSelectedRoleId(null); window.scrollTo(0, 0); };
+
+  return (
+    <div style={{ color: bridge.g900, background: '#fff', minHeight: '100vh' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(14px)', borderBottom: `1px solid ${bridge.g200}`, padding: '0 32px', height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <a href="/" aria-label="Bridge Group" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          <img src="/static/assets/logo-bridge-group-nav.png" alt="Bridge Group" style={{ height: '64px', width: 'auto', display: 'block' }} />
+        </a>
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+          <a href="#" style={{ fontSize: '14px', fontWeight: 700, color: bridge.g700, textDecoration: 'none' }}>Life at Bridge</a>
+          <a href="#" style={{ fontSize: '14px', fontWeight: 700, color: bridge.g700, textDecoration: 'none' }}>How we hire</a>
+          <a href="/" style={{ fontSize: '14px', fontWeight: 700, color: '#fff', textDecoration: 'none', background: bridge.blue, padding: '10px 18px', borderRadius: '10px', fontFamily: "'Poppins', sans-serif" }}>Home</a>
+        </div>
+      </nav>
+
+      {view === 'board' && (
+        <JobBoard
+          activeVertical={activeVertical} setActiveVertical={setActiveVertical}
+          searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+          selectedFunction={selectedFunction} setSelectedFunction={setSelectedFunction}
+          selectedRegion={selectedRegion} setSelectedRegion={setSelectedRegion}
+          selectedWorkMode={selectedWorkMode} setSelectedWorkMode={setSelectedWorkMode}
+          filteredRoles={filteredRoles} allRoles={roles} activeVerticalInfo={activeVerticalInfo} openRole={openRole}
+          rolesLoading={rolesLoading} rolesError={rolesError}
+        />
+      )}
+      {view === 'role' && selectedRole && (<RoleDetail role={selectedRole} goBack={goBack} startApplication={startApplication} />)}
+      {view === 'apply' && selectedRole && (<ApplicationFlow role={selectedRole} goBack={() => setView('role')} />)}
+
+      <footer style={{ background: '#0b1a2b', color: 'rgba(255,255,255,0.55)', padding: '48px 32px 24px' }}>
+        <div style={{ maxWidth: '1140px', margin: '0 auto', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '40px', paddingBottom: '32px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+          <div>
+            <a href="/" aria-label="Bridge Group" style={{ display: 'inline-block', marginBottom: '12px', textDecoration: 'none' }}>
+              <img src="/static/assets/logo-bridge-group-footer.svg" alt="Bridge Group" style={{ height: '140px', width: 'auto', display: 'block' }} />
+            </a>
+            <p style={{ fontSize: '13px', lineHeight: 1.7, maxWidth: '280px' }}>We build and run companies designed to fix broken systems. Systems thinking is how we work, not a marketing claim.</p>
+          </div>
+          <div>
+            <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: '12px', fontWeight: 700, color: '#fff', marginBottom: '14px' }}>Verticals</div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {['Bridge BSS', 'Bridge Talent', 'Bridge Health', 'Bridge Tech'].map(v => (<li key={v} style={{ marginBottom: '8px' }}><a href="#" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>{v}</a></li>))}
+            </ul>
+          </div>
+          <div>
+            <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: '12px', fontWeight: 700, color: '#fff', marginBottom: '14px' }}>Careers</div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {['All open roles', 'Life at Bridge', 'How we hire', 'Talent pool'].map(v => (<li key={v} style={{ marginBottom: '8px' }}><a href="#" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>{v}</a></li>))}
+            </ul>
+          </div>
+          <div>
+            <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: '12px', fontWeight: 700, color: '#fff', marginBottom: '14px' }}>Contact</div>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)' }}>careers@bridgebss.com</p>
+          </div>
+        </div>
+        <div style={{ maxWidth: '1140px', margin: '0 auto', paddingTop: '24px', fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>© 2026 Bridge BSS. All rights reserved.</div>
+      </footer>
+    </div>
+  );
+}
+
+function JobBoard({ activeVertical, setActiveVertical, searchQuery, setSearchQuery, selectedFunction, setSelectedFunction, selectedRegion, setSelectedRegion, selectedWorkMode, setSelectedWorkMode, filteredRoles, allRoles, activeVerticalInfo, openRole, rolesLoading, rolesError }) {
+  return (
+    <React.Fragment>
+      <section style={{ padding: '88px 32px 64px', position: 'relative', overflow: 'hidden', background: `linear-gradient(135deg, ${bridge.blue} 0%, ${bridge.blueDark} 100%)` }}>
+        <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 80% 60% at 70% 50%, rgba(96,63,131,0.45) 0%, transparent 70%), radial-gradient(ellipse 50% 70% at 15% 80%, rgba(33,166,130,0.22) 0%, transparent 60%)` }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(255,255,255,0.3)', color: 'rgba(255,255,255,0.9)', fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', padding: '6px 16px', borderRadius: '100px', marginBottom: '24px' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: bridge.teal }} />
+            Now hiring across {new Set(allRoles.map(r => r.region)).size} regions
+          </div>
+          <h1 style={{ fontFamily: "'Poppins', sans-serif", fontSize: 'clamp(34px, 5vw, 54px)', fontWeight: 800, color: '#fff', letterSpacing: '-1.5px', lineHeight: 1.1, marginBottom: '20px' }}>
+            Build systems that <em style={{ fontStyle: 'normal', background: `linear-gradient(135deg, ${bridge.yellow}, #f9b234)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>actually work</em>.
+          </h1>
+          <p style={{ fontSize: '17px', color: 'rgba(255,255,255,0.72)', lineHeight: 1.7, maxWidth: '620px', margin: '0 auto' }}>
+            Bridge builds and runs companies designed to fix broken systems. We hire people who notice where things are broken and want to do something about it — across software, science, finance, operations, and everything in between.
+          </p>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginTop: '20px', fontStyle: 'italic' }}>[ Employer brand content — head of marketing to finalize ]</p>
+        </div>
+      </section>
+
+      <section style={{ padding: '32px 32px 0', background: '#fff', borderBottom: `1px solid ${bridge.g200}` }}>
+        <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {verticals.map(v => {
+              const count = v.key === 'all' ? allRoles.length : allRoles.filter(r => r.verticalKey === v.key).length;
+              const isActive = activeVertical === v.key;
+              return (
+                <button key={v.key} onClick={() => setActiveVertical(v.key)}
+                  style={{ background: isActive ? v.color : 'transparent', color: isActive ? '#fff' : bridge.g700, border: isActive ? `1px solid ${v.color}` : `1px solid ${bridge.g200}`, padding: '10px 18px', borderRadius: '10px', fontFamily: "'Poppins', sans-serif", fontSize: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {v.name}
+                  <span style={{ background: isActive ? 'rgba(255,255,255,0.25)' : bridge.g100, color: isActive ? '#fff' : bridge.g500, fontSize: '12px', padding: '2px 8px', borderRadius: '100px', fontWeight: 700 }}>{count}</span>
+                </button>
+              );
+            })}
+          </div>
+          {activeVerticalInfo && activeVerticalInfo.key !== 'all' && (
+            <p style={{ fontSize: '14px', color: bridge.g500, marginTop: '16px', marginBottom: '24px' }}>
+              <strong style={{ color: activeVerticalInfo.color }}>{activeVerticalInfo.name}</strong> — {activeVerticalInfo.tagline}
+            </p>
+          )}
+          {activeVerticalInfo && activeVerticalInfo.key === 'all' && (<div style={{ height: '16px' }} />)}
+        </div>
+      </section>
+
+      <section style={{ padding: '24px 32px', background: bridge.g50, borderBottom: `1px solid ${bridge.g200}` }}>
+        <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: '1 1 260px', minWidth: '200px' }}>
+              <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: bridge.g500, display: 'flex' }}><Search size={16} /></div>
+              <input type="text" placeholder="Search roles, skills, teams…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                style={{ width: '100%', padding: '10px 14px 10px 40px', border: `1px solid ${bridge.g200}`, borderRadius: '10px', fontSize: '14px', background: '#fff', outline: 'none' }} />
+            </div>
+            <FilterSelect label="Function" value={selectedFunction} setValue={setSelectedFunction} options={functions} />
+            <FilterSelect label="Location" value={selectedRegion} setValue={setSelectedRegion} options={regions} />
+            <FilterSelect label="Work mode" value={selectedWorkMode} setValue={setSelectedWorkMode} options={workModes} />
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '40px 32px 80px', background: bridge.g50 }}>
+        <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '24px' }}>
+            <h2 style={{ fontFamily: "'Poppins', sans-serif", fontSize: '22px', fontWeight: 700, color: bridge.g900 }}>
+              {rolesLoading ? 'Loading roles…' : `${filteredRoles.length} ${filteredRoles.length === 1 ? 'role' : 'roles'} open`}
+            </h2>
+            <span style={{ fontSize: '13px', color: bridge.g500 }}>Most recent first</span>
+          </div>
+
+          {rolesError && (
+            <div style={{ background: '#fef3f2', border: '1px solid #fecdca', borderRadius: '12px', padding: '16px 20px', marginBottom: '16px', color: '#b42318', fontSize: '14px' }}>
+              {rolesError}
+            </div>
+          )}
+
+          {rolesLoading ? (
+            <div style={{ background: '#fff', border: `1px solid ${bridge.g200}`, borderRadius: '16px', padding: '48px', textAlign: 'center', color: bridge.g500 }}>
+              Loading open roles…
+            </div>
+          ) : filteredRoles.length === 0 ? (
+            <div style={{ background: '#fff', border: `1px solid ${bridge.g200}`, borderRadius: '16px', padding: '48px', textAlign: 'center' }}>
+              <p style={{ fontSize: '16px', color: bridge.g700, marginBottom: '8px', fontWeight: 600 }}>Nothing matches right now</p>
+              <p style={{ fontSize: '14px', color: bridge.g500 }}>Try clearing filters — or join the talent pool and we'll reach out when something fits.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {filteredRoles.map(role => (<RoleCard key={role.id} role={role} onClick={() => openRole(role.id)} />))}
+            </div>
+          )}
+
+          <div style={{ marginTop: '48px', padding: '36px 40px', background: `linear-gradient(135deg, ${bridge.blue}, ${bridge.purple})`, borderRadius: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+            <div>
+              <h3 style={{ fontFamily: "'Poppins', sans-serif", fontSize: '20px', fontWeight: 700, color: '#fff', marginBottom: '6px' }}>Don't see the right role yet?</h3>
+              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.75)', maxWidth: '560px' }}>Join our talent pool. We'll reach out when something fits what you do and where you want to go — not before.</p>
+            </div>
+            <button style={{ background: '#fff', color: bridge.blue, border: 'none', padding: '14px 28px', borderRadius: '10px', fontFamily: "'Poppins', sans-serif", fontSize: '14px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>Join talent pool →</button>
+          </div>
+        </div>
+      </section>
+    </React.Fragment>
+  );
+}
+
+function FilterSelect({ label, value, setValue, options }) {
+  return (
+    <select value={value} onChange={e => setValue(e.target.value)} aria-label={label}
+      style={{ padding: '10px 14px', border: `1px solid ${bridge.g200}`, borderRadius: '10px', fontSize: '14px', background: '#fff', color: bridge.g700, cursor: 'pointer', outline: 'none', minWidth: '140px' }}>
+      {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+    </select>
+  );
+}
+
+function HiringStatusBadge({ status, fontSize = '11px' }) {
+  if (status !== 'Actively hiring' && status !== 'Open') return null;
+  const isActive = status === 'Actively hiring';
+  const color = isActive ? bridge.teal : bridge.blue;
+  const dotColor = isActive ? bridge.teal : bridge.blue;
+  const background = isActive ? bridge.tealLight : bridge.blueLight;
+  return (
+    <span style={{
+      fontSize, fontWeight: 700, color, display: 'inline-flex', alignItems: 'center', gap: '4px',
+      background, padding: '4px 10px', borderRadius: '6px',
+    }}>
+      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
+      {status}
+    </span>
+  );
+}
+
+function RoleCard({ role, onClick }) {
+  const vInfo = verticals.find(v => v.key === role.verticalKey);
+  return (
+    <button onClick={onClick}
+      style={{ background: '#fff', border: `1px solid ${bridge.g200}`, borderRadius: '16px', padding: '24px 28px', cursor: 'pointer', textAlign: 'left', width: '100%', transition: 'all 0.2s', display: 'flex', gap: '20px', alignItems: 'flex-start', justifyContent: 'space-between' }}
+      onMouseOver={e => { e.currentTarget.style.borderColor = vInfo.color; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 12px 32px rgba(14,67,111,0.08)`; }}
+      onMouseOut={e => { e.currentTarget.style.borderColor = bridge.g200; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
+      <div style={{ flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: vInfo.color, background: vInfo.colorLight, padding: '4px 10px', borderRadius: '6px' }}>{vInfo.name}</span>
+          <span style={{ fontSize: '12px', color: bridge.g500 }}>{role.function}</span>
+          <HiringStatusBadge status={role.urgency} />
+        </div>
+        <h3 style={{ fontFamily: "'Poppins', sans-serif", fontSize: '19px', fontWeight: 700, color: bridge.g900, marginBottom: '8px' }}>{role.title}</h3>
+        <p style={{ fontSize: '14px', color: bridge.g500, lineHeight: 1.6, marginBottom: '14px', maxWidth: '720px' }}>{role.summary}</p>
+        <div style={{ display: 'flex', gap: '18px', fontSize: '13px', color: bridge.g500, flexWrap: 'wrap' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={14} />{role.location}</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={14} />{role.type} · {role.workMode}</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Clock size={14} />Posted {role.posted}</span>
+        </div>
+      </div>
+      <div style={{ paddingTop: '4px' }}><ArrowRight size={20} color={bridge.g500} /></div>
+    </button>
+  );
+}
+
+function RoleDetail({ role, goBack, startApplication }) {
+  const vInfo = verticals.find(v => v.key === role.verticalKey);
+  return (
+    <React.Fragment>
+      <div style={{ padding: '24px 32px 0', background: bridge.g50 }}>
+        <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
+          <button onClick={goBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: bridge.g500, fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>← All open roles</button>
+        </div>
+      </div>
+
+      <section style={{ padding: '32px 32px 48px', background: bridge.g50 }}>
+        <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: vInfo.color, background: vInfo.colorLight, padding: '5px 12px', borderRadius: '6px' }}>{vInfo.name}</span>
+            <span style={{ fontSize: '13px', color: bridge.g500 }}>{role.function}</span>
+            <HiringStatusBadge status={role.urgency} fontSize="12px" />
+          </div>
+          <h1 style={{ fontFamily: "'Poppins', sans-serif", fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 800, color: bridge.g900, letterSpacing: '-1px', marginBottom: '20px', lineHeight: 1.15 }}>{role.title}</h1>
+          <div style={{ display: 'flex', gap: '24px', fontSize: '14px', color: bridge.g700, flexWrap: 'wrap', marginBottom: '28px' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={15} />{role.location}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={15} />{role.type} · {role.workMode}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Clock size={15} />Posted {role.posted}</span>
+          </div>
+          <button onClick={startApplication} style={{ background: vInfo.color, color: '#fff', border: 'none', padding: '14px 32px', borderRadius: '10px', fontFamily: "'Poppins', sans-serif", fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>Apply for this role →</button>
+        </div>
+      </section>
+
+      <section style={{ padding: '64px 32px', background: '#fff' }}>
+        <div style={{ maxWidth: '860px', margin: '0 auto', display: 'grid', gap: '40px' }}>
+          <div>
+            <h2 style={{ fontFamily: "'Poppins', sans-serif", fontSize: '20px', fontWeight: 700, color: bridge.g900, marginBottom: '12px' }}>About the role</h2>
+            <p style={{ fontSize: '16px', lineHeight: 1.7, color: bridge.g700 }}>{role.summary}</p>
+          </div>
+
+          <div>
+            <h2 style={{ fontFamily: "'Poppins', sans-serif", fontSize: '20px', fontWeight: 700, color: bridge.g900, marginBottom: '16px' }}>What we need you to bring</h2>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '10px' }}>
+              {role.requirements.map((req, i) => (
+                <li key={i} style={{ display: 'flex', gap: '12px', fontSize: '15px', color: bridge.g700, lineHeight: 1.6 }}>
+                  <div style={{ color: vInfo.color, flexShrink: 0, marginTop: '3px', display: 'flex' }}><Check size={18} /></div>
+                  <span>{req}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h2 style={{ fontFamily: "'Poppins', sans-serif", fontSize: '20px', fontWeight: 700, color: bridge.g900, marginBottom: '16px' }}>Nice to have</h2>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '10px' }}>
+              {role.niceToHave.map((req, i) => (
+                <li key={i} style={{ display: 'flex', gap: '12px', fontSize: '15px', color: bridge.g700, lineHeight: 1.6 }}>
+                  <span style={{ color: bridge.g500, flexShrink: 0, marginTop: '3px' }}>·</span>
+                  <span>{req}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div style={{ background: bridge.g50, border: `1px solid ${bridge.g200}`, borderRadius: '12px', padding: '20px 24px' }}>
+            <div style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: bridge.g500, marginBottom: '6px' }}>Compensation</div>
+            <div style={{ fontSize: '16px', fontWeight: 700, color: bridge.g900 }}>{role.salary}</div>
+          </div>
+
+          <div>
+            <h2 style={{ fontFamily: "'Poppins', sans-serif", fontSize: '20px', fontWeight: 700, color: bridge.g900, marginBottom: '16px' }}>How our hiring process works</h2>
+            <div style={{ display: 'grid', gap: '14px' }}>
+              {[
+                { step: '1', title: 'Apply', detail: 'Quick application with a few role-specific questions. We respond to every applicant.' },
+                { step: '2', title: 'Screen', detail: 'If there\'s a fit, a 30-minute call with our talent team to understand your situation and answer yours.' },
+                { step: '3', title: 'Evaluate', detail: 'A focused technical or skills evaluation — capped at 2 hours, designed to test what the job actually requires.' },
+                { step: '4', title: 'Interview', detail: 'Structured interview with the hiring manager, a peer, and a member of our TA team. Typically 60 minutes.' },
+                { step: '5', title: 'Offer', detail: 'We aim to make a decision within 5 business days of your final interview, with transparent comp and scope.' },
+              ].map(s => (
+                <div key={s.step} style={{ display: 'flex', gap: '16px', padding: '16px 20px', background: bridge.g50, borderRadius: '10px', border: `1px solid ${bridge.g200}` }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: vInfo.colorLight, color: vInfo.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Poppins', sans-serif", fontSize: '14px', fontWeight: 800, flexShrink: 0 }}>{s.step}</div>
+                  <div>
+                    <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: '15px', fontWeight: 700, color: bridge.g900, marginBottom: '4px' }}>{s.title}</div>
+                    <div style={{ fontSize: '14px', color: bridge.g500, lineHeight: 1.6 }}>{s.detail}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ paddingTop: '16px', textAlign: 'center' }}>
+            <button onClick={startApplication} style={{ background: vInfo.color, color: '#fff', border: 'none', padding: '16px 36px', borderRadius: '10px', fontFamily: "'Poppins', sans-serif", fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>Apply for this role →</button>
+          </div>
+        </div>
+      </section>
+    </React.Fragment>
+  );
+}
+
+function ApplicationFlow({ role, goBack }) {
+  const vInfo = verticals.find(v => v.key === role.verticalKey);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [formData, setFormData] = useState({
+    name: '', email: '', phone: '', location: '',
+    currentEmployment: '', noticePeriod: '', expectedSalary: '',
+    skills: {},
+    cv: null
+  });
+
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      skills: (role.requirements || []).reduce((acc, r) => ({ ...acc, [r]: { has: '', note: '' } }), {}),
+    }));
+  }, [role.id]);
+
+  const handleSubmit = async () => {
+    setSubmitError('');
+    if (!formData.name.trim() || !formData.email.trim()) {
+      setSubmitError('Please enter your name and email.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const body = new FormData();
+      body.append('name', formData.name.trim());
+      body.append('email', formData.email.trim());
+      body.append('phone', formData.phone.trim());
+      body.append('location', formData.location.trim());
+      body.append('current_employment', formData.currentEmployment.trim());
+      body.append('notice_period', formData.noticePeriod.trim());
+      body.append('expected_salary', formData.expectedSalary.trim());
+      body.append('skills', JSON.stringify(formData.skills));
+      if (formData.cv) body.append('cv', formData.cv);
+      const res = await fetch(`/api/careers/jobs/${encodeURIComponent(role.id)}/applications`, {
+        method: 'POST',
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || 'Submission failed.');
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(err.message || 'Could not submit application.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (submitted) {
+    return (
+      <section style={{ padding: '96px 32px', background: bridge.g50, minHeight: '60vh' }}>
+        <div style={{ maxWidth: '620px', margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: bridge.tealLight, color: bridge.teal, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <Check size={32} />
+          </div>
+          <h1 style={{ fontFamily: "'Poppins', sans-serif", fontSize: '28px', fontWeight: 800, color: bridge.g900, marginBottom: '12px' }}>Application received</h1>
+          <p style={{ fontSize: '16px', color: bridge.g500, lineHeight: 1.7, marginBottom: '32px' }}>
+            Thanks for applying to {role.title}. Our team has received your application and will be in touch if there is a fit.
+          </p>
+          <button onClick={goBack} style={{ background: vInfo.color, color: '#fff', border: 'none', padding: '12px 28px', borderRadius: '10px', fontFamily: "'Poppins', sans-serif", fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>See more open roles</button>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section style={{ padding: '48px 32px 80px', background: bridge.g50 }}>
+      <div style={{ maxWidth: '720px', margin: '0 auto' }}>
+        <button onClick={goBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: bridge.g500, fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '24px' }}>← Back to role</button>
+
+        <div style={{ background: '#fff', border: `1px solid ${bridge.g200}`, borderRadius: '16px', padding: '36px 40px' }}>
+          <h1 style={{ fontFamily: "'Poppins', sans-serif", fontSize: '24px', fontWeight: 800, color: bridge.g900, marginBottom: '6px' }}>Apply — {role.title}</h1>
+          <p style={{ fontSize: '14px', color: bridge.g500, marginBottom: '32px' }}>Expected time: 5–10 minutes. Nothing is saved until you submit.</p>
+
+          <FormGroup label="Full name"><Input value={formData.name} onChange={v => setFormData({ ...formData, name: v })} /></FormGroup>
+          <FormGroup label="Email"><Input type="email" value={formData.email} onChange={v => setFormData({ ...formData, email: v })} /></FormGroup>
+          <FormGroup label="Phone"><Input value={formData.phone} onChange={v => setFormData({ ...formData, phone: v })} /></FormGroup>
+          <FormGroup label="Current location"><Input value={formData.location} onChange={v => setFormData({ ...formData, location: v })} placeholder="City, country" /></FormGroup>
+          <FormGroup label="Currently employed?"><Input value={formData.currentEmployment} onChange={v => setFormData({ ...formData, currentEmployment: v })} placeholder="Current role & company, or 'not currently employed'" /></FormGroup>
+          <FormGroup label="Notice period"><Input value={formData.noticePeriod} onChange={v => setFormData({ ...formData, noticePeriod: v })} placeholder="e.g. 4 weeks, immediately available" /></FormGroup>
+          <FormGroup label="Expected compensation"><Input value={formData.expectedSalary} onChange={v => setFormData({ ...formData, expectedSalary: v })} placeholder="Total, currency, period" /></FormGroup>
+
+          <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: `1px solid ${bridge.g200}` }}>
+            <h2 style={{ fontFamily: "'Poppins', sans-serif", fontSize: '16px', fontWeight: 700, color: bridge.g900, marginBottom: '6px' }}>Requirements</h2>
+            <p style={{ fontSize: '13px', color: bridge.g500, marginBottom: '20px', lineHeight: 1.6 }}>For each, let us know if it applies — and add context where it'd help.</p>
+
+            {role.requirements.map((req, i) => (
+              <div key={i} style={{ padding: '16px 20px', background: bridge.g50, borderRadius: '10px', border: `1px solid ${bridge.g200}`, marginBottom: '12px' }}>
+                <div style={{ fontSize: '14px', color: bridge.g900, marginBottom: '10px', fontWeight: 600 }}>{req}</div>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                  {['Yes', 'Partially', 'No'].map(opt => (
+                    <button key={opt} onClick={() => setFormData({ ...formData, skills: { ...formData.skills, [req]: { ...formData.skills[req], has: opt } } })}
+                      style={{ padding: '6px 14px', borderRadius: '8px', border: `1px solid ${formData.skills[req]?.has === opt ? vInfo.color : bridge.g200}`, background: formData.skills[req]?.has === opt ? vInfo.colorLight : '#fff', color: formData.skills[req]?.has === opt ? vInfo.color : bridge.g700, fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>{opt}</button>
+                  ))}
+                </div>
+                <input type="text" placeholder="Optional: brief context" value={formData.skills[req]?.note || ''}
+                  onChange={e => setFormData({ ...formData, skills: { ...formData.skills, [req]: { ...formData.skills[req], note: e.target.value } } })}
+                  style={{ width: '100%', padding: '8px 12px', border: `1px solid ${bridge.g200}`, borderRadius: '8px', fontSize: '13px', background: '#fff', outline: 'none' }} />
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: '24px' }}>
+            <label style={{ fontSize: '13px', fontWeight: 700, color: bridge.g700, marginBottom: '8px', display: 'block' }}>CV / Resume</label>
+            <label style={{ border: `2px dashed ${bridge.g200}`, borderRadius: '10px', padding: '24px', textAlign: 'center', cursor: 'pointer', background: '#fff', display: 'block' }}>
+              <input type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style={{ display: 'none' }}
+                onChange={e => setFormData({ ...formData, cv: e.target.files && e.target.files[0] ? e.target.files[0] : null })} />
+              <div style={{ color: bridge.g500, marginBottom: '8px', display: 'flex', justifyContent: 'center' }}><Upload size={24} /></div>
+              <div style={{ fontSize: '14px', color: bridge.g700, fontWeight: 600, marginBottom: '4px' }}>
+                {formData.cv ? formData.cv.name : 'Drop your CV here or click to browse'}
+              </div>
+              <div style={{ fontSize: '12px', color: bridge.g500 }}>PDF, DOC, or DOCX · max 10MB</div>
+            </label>
+          </div>
+
+          {submitError && (
+            <p style={{ fontSize: '14px', color: '#b42318', marginTop: '16px' }}>{submitError}</p>
+          )}
+
+          <button onClick={handleSubmit} disabled={submitting} style={{ background: vInfo.color, color: '#fff', border: 'none', padding: '14px 32px', borderRadius: '10px', fontFamily: "'Poppins', sans-serif", fontSize: '15px', fontWeight: 700, cursor: submitting ? 'wait' : 'pointer', marginTop: '32px', width: '100%', opacity: submitting ? 0.7 : 1 }}>
+            {submitting ? 'Submitting…' : 'Submit application'}
+          </button>
+          <p style={{ fontSize: '12px', color: bridge.g500, marginTop: '12px', textAlign: 'center', lineHeight: 1.5 }}>By submitting, you agree to Bridge processing your application data for hiring purposes. We keep your data for 12 months and you can request deletion at any time.</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FormGroup({ label, children }) {
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      <label style={{ fontSize: '13px', fontWeight: 700, color: bridge.g700, marginBottom: '6px', display: 'block' }}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function Input({ value, onChange, type = 'text', placeholder = '' }) {
+  return (
+    <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+      style={{ width: '100%', padding: '10px 14px', border: `1px solid ${bridge.g200}`, borderRadius: '10px', fontSize: '14px', background: '#fff', outline: 'none' }} />
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<BridgeCareers />);
+document.getElementById('loading').style.display = 'none';
+</script>
+</body>
+</html>
